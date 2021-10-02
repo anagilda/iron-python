@@ -7,6 +7,7 @@ from typing import (
     Optional,
 )
 
+from Crypto.Cipher import AES
 from Crypto.Hash import SHA1
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Random import random
@@ -52,6 +53,9 @@ class Iron:
         """
         Get the algorithm of the current iron instance.
 
+        Raises:
+            ConfigurationError: when the algorithm is not correctly configured in the options.
+
         Returns:
             The algorithm name, as a string.
         """
@@ -61,9 +65,28 @@ class Iron:
             raise ConfigurationError(message='Bad options: `algorithm` is missing')
 
     @property
+    def algorithm_mode(self) -> str:
+        """
+        Get the algorithm mode of the current iron instance.
+
+        Raises:
+            ConfigurationError: when the algorithm mode is not correctly configured in the options.
+
+        Returns:
+            The algorithm mode, as a string.
+        """
+        try:
+            return self.options['algorithm_mode']
+        except KeyError:
+            raise ConfigurationError(message='Bad options: `algorithm_mode` is missing')
+
+    @property
     def min_password_length(self) -> int:
         """
         Get the minimum password length of the current iron instance.
+
+        Raises:
+            ConfigurationError: when the minimum password length is not correctly configured in the options.
 
         Returns:
             The minimum password length, as an integer.
@@ -136,3 +159,20 @@ class Iron:
             encryption_key.initialization_vector = random.getrandbits(k=algorithm['iv_bits'])
 
         return encryption_key
+
+    def decrypt(self, data: str) -> bytes:
+        """
+        Decrypt data.
+
+        Arguments:
+            data (str): encrypted data.
+
+        Returns:
+            The data in a decrypted format, as bytes.
+        """
+        key = self._generate_key()
+
+        decipher = AES.new(mode=self.algorithm_mode, key=key.key, iv=key.initialization_vector)
+        deciphered_data = decipher.decrypt(data)
+
+        return deciphered_data
