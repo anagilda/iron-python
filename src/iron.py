@@ -1,6 +1,9 @@
 """
 Provide the Iron algorithm for authentication.
 """
+import base64
+import json
+from json import JSONDecodeError
 from typing import (
     Any,
     Dict,
@@ -15,6 +18,7 @@ from Crypto.Random import random
 from constants import (
     ALGORITHMS,
     ENCRYPTION_DEFAULT_OPTIONS,
+    MAC_PREFIX,
     EncryptionKey,
 )
 from errors import ConfigurationError
@@ -106,6 +110,13 @@ class Iron:
         """
         return self.options.get('salt')
 
+    @salt.setter
+    def salt(self, value: str) -> None:
+        """
+        Set the salt of the current iron instance.
+        """
+        self.options['salt'] = value
+
     @property
     def salt_bits(self) -> Optional[int]:
         """
@@ -115,6 +126,23 @@ class Iron:
             The salt bits, as an integer. If not set, then returns `None`.
         """
         return self.options.get('salt_bits')
+
+    @property
+    def initialization_vector(self) -> Optional[str]:
+        """
+        Get the initialization vector of the current iron instance.
+
+        Returns:
+            The initialization vector, as a string. If not set, then returns `None`.
+        """
+        return self.options.get('initialization_vector')
+
+    @initialization_vector.setter
+    def initialization_vector(self, value: str) -> None:
+        """
+        Set the initialization_vector of the current iron instance.
+        """
+        self.options['initialization_vector'] = value
 
     def _generate_key(self) -> EncryptionKey:
         """
@@ -153,10 +181,10 @@ class Iron:
             key=derived_key,
             salt=salt,
         )
-        if self.options.get('iv'):
-            encryption_key.initialization_vector = self.options['iv']
-        elif algorithm.get('iv_bits'):
-            encryption_key.initialization_vector = random.getrandbits(k=algorithm['iv_bits'])
+        if self.initialization_vector:
+            encryption_key.initialization_vector = self.initialization_vector
+        elif algorithm.get('initialization_vector_bits'):
+            encryption_key.initialization_vector = random.getrandbits(k=algorithm['initialization_vector_bits'])
 
         return encryption_key
 
@@ -176,3 +204,44 @@ class Iron:
         deciphered_data = decipher.decrypt(data)
 
         return deciphered_data
+
+    def unseal(self, sealed: str) -> Dict[str, Any]:
+        """
+        Decrypt and validate a sealed string.
+
+        Arguments:
+            sealed (str): sealed string to be derypted.
+
+        Raises:
+            ValueError: when the sealed string is incorrect or is not a valid JSON.
+
+        Returns:
+            The unsealed information, as a dictionary.
+        """
+        parts = sealed.split('*')
+        try:
+            mac_prefix, password_id, encryption_salt, encryption_iv, encrypted_b64, expiration, hmac_salt, hmac = parts
+        except ValueError:
+            raise ValueError('Incorrect number of sealed omponents in the provided encrypted string')
+
+        if mac_prefix != MAC_PREFIX:
+            raise ValueError('Wrong mac prefix in the provided encrypted string')
+
+        encrypted_value = base64.urlsafe_b64decode(encrypted_b64)
+
+        self.salt = encryption_salt
+
+        try:
+            padded_encryption_initialization_vector = encryption_iv + '=' * (-len(encryption_iv) % 4)
+            self.initialization_vector = base64.urlsafe_b64decode(padded_encryption_initialization_vector)
+        except Exception as error:
+            raise error
+
+        decrypted_value = self.decrypt(data=encrypted_value)
+
+        decrypted_value_without_padding = decrypted_value.replace(b'\x0f', b'')
+        try:
+            return json.loads(decrypted_value_without_padding)
+        except (UnicodeDecodeError, JSONDecodeError):
+            print('Failed parsing sealed object JSON')
+            return {}

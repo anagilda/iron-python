@@ -18,8 +18,8 @@ class EncryptionKey:
 
 
 ALGORITHMS = {
-    'aes-128-ctr': {'key_bits': 128, 'iv_bits': 128},
-    'aes-256-cbc': {'key_bits': 256, 'iv_bits': 128},
+    'aes-128-ctr': {'key_bits': 128, 'initialization_vector_bits': 128},
+    'aes-256-cbc': {'key_bits': 256, 'initialization_vector_bits': 128},
     'sha256': {'key_bits': 256},
 }
 
@@ -30,3 +30,6 @@ ENCRYPTION_DEFAULT_OPTIONS = {
     'iterations': 1,
     'min_password_length': 32,
 }
+
+MAC_FORMAT_VERSION = '2'
+MAC_PREFIX = 'Fe26.' + MAC_FORMAT_VERSION
