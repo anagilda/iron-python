@@ -8,7 +8,7 @@ class ConfigurationError(Exception):
     """
     Configuration error implementation.
 
-    It is raised when some configuration value is not valid or missing.
+    It's raised when some configuration value is not valid or missing.
     """
 
     default_message = 'Some configurations are incorrect or missing. Please check them'

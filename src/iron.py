@@ -1,5 +1,5 @@
 """
-Provide the Iron algorithm for authentication.
+Provide the iron algorithm for authentication.
 """
 import base64
 import json
