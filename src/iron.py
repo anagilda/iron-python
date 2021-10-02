@@ -114,6 +114,8 @@ class Iron:
     def salt(self, value: str) -> None:
         """
         Set the salt of the current iron instance.
+
+c
         """
         self.options['salt'] = value
 
@@ -140,7 +142,10 @@ class Iron:
     @initialization_vector.setter
     def initialization_vector(self, value: str) -> None:
         """
-        Set the initialization_vector of the current iron instance.
+        Set the initialization vector of the current iron instance.
+
+        Arguments:
+            value (str) : new value for the initialization vector property.
         """
         self.options['initialization_vector'] = value
 
