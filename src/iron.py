@@ -8,6 +8,7 @@ from typing import (
 )
 
 from constants import ENCRYPTION_DEFAULT_OPTIONS
+from errors import ConfigurationError
 
 
 class Iron:
@@ -26,5 +27,11 @@ class Iron:
             password (str): encryption password.
             options (dict): encryption options.
         """
+        if not self.password:
+            raise ConfigurationError(message='Empty password')
+
+        if not self.options or not isinstance(self.options, dict):
+            raise ConfigurationError(message='Bad options')
+
         self.password = password
         self.options = options if options else ENCRYPTION_DEFAULT_OPTIONS

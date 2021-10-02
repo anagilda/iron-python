@@ -11,7 +11,7 @@ class ConfigurationError(Exception):
     It is raised when some configuration value is not valid or missing.
     """
 
-    default_message = 'Some configurations are incorrect or missing. Please check them.'
+    default_message = 'Some configurations are incorrect or missing. Please check them'
 
     def __init__(self, message: Optional[str] = None) -> None:
         """
