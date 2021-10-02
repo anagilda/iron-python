@@ -17,6 +17,12 @@ class EncryptionKey:
     initialization_vector: bytes = b''
 
 
+ALGORITHMS = {
+    'aes-128-ctr': {'key_bits': 128, 'iv_bits': 128},
+    'aes-256-cbc': {'key_bits': 256, 'iv_bits': 128},
+    'sha256': {'key_bits': 256},
+}
+
 ENCRYPTION_DEFAULT_OPTIONS = {
     'salt_bits': 256,
     'algorithm': 'aes-256-cbc',
