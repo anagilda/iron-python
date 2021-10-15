@@ -46,11 +46,12 @@ class Iron:
         if not password:
             raise ConfigurationError(message='Empty password')
 
+        options = options if options is not None else ENCRYPTION_DEFAULT_OPTIONS
         if not options or not isinstance(options, dict):
             raise ConfigurationError(message='Bad options')
 
         self.password = password
-        self.options = options if options else ENCRYPTION_DEFAULT_OPTIONS
+        self.options = options
 
     @property
     def algorithm(self) -> str:
