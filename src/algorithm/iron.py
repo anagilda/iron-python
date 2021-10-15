@@ -4,23 +4,14 @@ Provide the iron algorithm for authentication.
 import base64
 import json
 from json import JSONDecodeError
-from typing import (
-    Any,
-    Dict,
-    Optional,
-)
+from typing import Any, Dict, Optional
 
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA1
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Random import random
 
-from constants import (
-    ALGORITHMS,
-    ENCRYPTION_DEFAULT_OPTIONS,
-    MAC_PREFIX,
-    EncryptionKey,
-)
+from constants import ALGORITHMS, ENCRYPTION_DEFAULT_OPTIONS, MAC_PREFIX, EncryptionKey
 from errors import ConfigurationError
 
 
