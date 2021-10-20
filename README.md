@@ -60,5 +60,5 @@ is meant fo cross-language codebases.
 Seal the cookie by providing a new token value (as found in the tokens mongo collection), and the password for encryption:
 
 ```bash
-node iron_seal.js password="strongpassword" token="thetokenmustbeatleast32characaters"
+node iron_seal.js password="thepasswordmustbeatleast32characters" token="token-to-encrypt"
 ```
